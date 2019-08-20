@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const mongooseCurrency = require('mongoose-currency');
 
 const Dishes = require("../models/dishes");
 
