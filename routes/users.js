@@ -3,6 +3,7 @@ var router = express.Router();
 const User = require('../models/user');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const passport = require('passport');
 
 const url = "mongodb://127.0.0.1:27017/conFusion"
 const connection = mongoose.connect(url)
@@ -19,7 +20,7 @@ connection
 
 
 router.post("/signup", (req, res, next) => {
-    User.findOne({username: req.body.username})
+    /*User.findOne({username: req.body.username})
         .then((user) => {
             
             if(user != null){
@@ -39,12 +40,35 @@ router.post("/signup", (req, res, next) => {
             res.setHeader('Content-Type', 'application/json');
             res.json({status: 'Registration Successful!', user: user});
         }, (err) => next(err))
-        .catch((err) => next(err));
+        .catch((err) => next(err));*/
+    
+    User.register(new User({username: req.body.username}),
+        req.body.password, (err, user) =>{
+            if(err){
+                res.statusCode = 500;
+                res.setHeader('Content-Type', "application/json");
+                res.json({err: err});
+            }else{
+                passport.authenticate('local')(req, res, () => {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json({success: true, status: 'Registration Successful!'});
+                })
+            }
+        }
+    )
+
+
 });
 
-router.post("/login", (req, res, next) => {
+router.post("/login", passport.authenticate('local'),(req, res) => {
 
-    if(!req.session.user){
+
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: true, status: 'You are successfully logged in!'});
+
+    /*if(!req.session.user){
         var authHeader = req.headers.authorization;
     
         if (!authHeader) {
@@ -84,7 +108,7 @@ router.post("/login", (req, res, next) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'text/plain');
         res.end('You are already authenticated!');
-    }
+    }*/
 });
 
 
