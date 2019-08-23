@@ -31,10 +31,15 @@ router.post("/signup", (req, res, next) => {
                 res.setHeader('Content-Type', "application/json");
                 res.json({err: err});
             }else{
-                if(req.body.username)
-                    user.username = req.body.username;
-                if(req.body.lastname)
-                    user.lastname = req.body.lastname;
+                if(req.body.firstname){
+                    user.firstName = req.body.firstname;
+                }
+                    
+                if(req.body.lastname){
+                    user.lastName = req.body.lastname;
+                }
+                
+
                 user.save((err, user) => {
                     if(err){
                         res.statusCode = 500;
@@ -65,6 +70,14 @@ router.post("/login", passport.authenticate('local'),(req, res) => {
 
 });
 
+router.get("", authenticate.verifyUser, authenticate.verifyAdmin, (rew, res) =>{
+    User.find({})
+        .then((users) =>{
+            res.statusCode = 200;
+            res.setHeader("Content-Type", "application/json");
+            res.json(users);
+        })
+})
 
 router.get("/logout", (req, res, next) => {
     if(req.session){

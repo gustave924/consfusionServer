@@ -1,7 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose')
+
 const promotions = require("../models/promotions");
+const authenticate = require("../authenticate");
 
 const url = "mongodb://127.0.0.1:27017/conFusion"
 const connection = mongoose.connect(url);
@@ -31,7 +33,7 @@ promotionsRouter.route("/")
         }, (err) => next(err))
         .catch((err) => next(err));
 })
-.post((req, res, next) => {
+.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     //res.end(`we will add the promotions with name = ${req.body.name} and description = ${req.body.description}`);
     promotions.create(req.body)
         .then((promotion) =>{
@@ -40,12 +42,12 @@ promotionsRouter.route("/")
         .catch((err) => next(err))
 
 })
-.put((req, res, next) => {
+.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     res.statusCode = 403;
     res.setHeader("Content-Type","text/plain");
     res.end("Operation not supported ");
 })
-.delete((req, res, next) => {
+.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     //res.end("We will delete all promotions");
     promotions.remove({})
         .then((promotions)=>{
@@ -67,12 +69,12 @@ promotionsRouter.route("/:promotionId")
         }, (err) => next(err))
         .catch((err) => next(err))
 })
-.post((req, res, next) => {
+.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     res.statusCode = 403;
     res.setHeader("Content-Type","text/plain");
     res.end(`Operation not supported on /promotions/${req.params.promotionId}`);
 })
-.put((req, res, next) => {
+.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
    /* res.end(`We will update the promotion with id = ${req.params.promotionId} to have a name = ${req.body.name} 
     and description = ${req.body.description}`);*/
 
@@ -82,7 +84,7 @@ promotionsRouter.route("/:promotionId")
         }, (err) => next(err))
         .catch((err) => next(err));
 })
-.delete((req, res, next) => {
+.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     //res.end(`We will delete the promotion with id = ${req.params.promotionId}`);
     promotions.findByIdAndRemove(req.params.promotionId)
         .then((resp)=>{

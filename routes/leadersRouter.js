@@ -1,7 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+
 const leaders = require('../models/leaders');
+const authenticate = require("../authenticate");
 
 const url = "mongodb://127.0.0.1:27017/conFusion"
 const connection = mongoose.connect(url)
@@ -30,19 +32,19 @@ leadersRouter.route("/")
         },(err) =>  next(err))
         .catch((err) => next(err))
 })
-.post((req, res, next) => {
+.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     leaders.create(req.body)
         .then((leader) => {
             res.json(leader);
         }, (err) => next(err))
         .catch((err) => next(err))
 })
-.put((req, res, next) => {
+.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     res.statusCode = 403;
     res.setHeader("Content-Type", "text/plain");
     res.end(`Operation not supported on /leaders`);
 })
-.delete((req, res, next) => {
+.delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     leaders.remove({})
         .then((resp) => {
             res.json(resp)
@@ -63,19 +65,19 @@ leadersRouter.route("/:leaderId")
         }, err => next(err))
         .catch(err => next(err))
 })
-.post((req, res,  next) => {
+.post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res,  next) => {
     res.statusCode = 403;
     res.setHeader("Content-Type", "text/plain");
     res.end("Operation not supported")
 })
-.put((req, res, next) => {
+.put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
    leaders.findByIdAndUpdate(req.params.leaderId, {$set: req.body}, {new: true})
         .then(leader => {
             res.json(leader);
         }, err => next(err))
         .catch(err => next(err))
 })
-.delete((req, res, next) => {
+.delete(authenticate.verifyUser,authenticate.verifyAdmin, (req, res, next) => {
    leaders.findByIdAndRemove(req.params.leaderId)
     .then(resp => {
         res.json(resp)
