@@ -8,6 +8,7 @@ var FileStore = require('session-file-store')(session);
 var passport = require('passport');
 
 
+var config = require('./config');
 var authenticate = require('./authenticate');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -17,33 +18,14 @@ var promotionsRouter = require("./routes/promotionsRouter");
 
 var app = express();
 //app.use(cookieParser('1@Ok191097#CalmDown#1989#GuStave#924'));
-app.use(session({
-    name: 'session-id',
-    secret: '1@Ok191097#CalmDown#1989#GuStave#924',
-    saveUninitialized: false,
-    resave: false,
-    store: new FileStore()
-}));
+const url = config.mongoUrl
 
 
 
-function auth(req, res, next){
-    console.log(req.user);
-
-    if (!req.user) {
-        var err = new Error('You are not authenticated!');
-        err.status = 403;
-        next(err);
-    }
-    else {
-        next();
-    }
-}
 app.use(passport.initialize());
 app.use(passport.session());
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use(auth)
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

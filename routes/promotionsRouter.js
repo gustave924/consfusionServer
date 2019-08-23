@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose')
 const promotions = require("../models/promotions");
 
-const url = "mongodb://127.0.0.1:27017/consFusion"
+const url = "mongodb://127.0.0.1:27017/conFusion"
 const connection = mongoose.connect(url);
 
 const promotionsRouter = express.Router();
